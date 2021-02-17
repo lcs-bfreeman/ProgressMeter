@@ -8,15 +8,23 @@
 import SwiftUI
 
 struct ContentView: View {
+    // For driving animation to reveal rectangle with progress meter fill
+        @State private var progressMeterOffset = CGSize.zero
     var body: some View {
         VStack {
-            // "Fill" for progress meter; stationary
-            Rectangle()
-                .frame(width: 100, height: 548 - 44, alignment: .center)
-            // Will slide up
-            Rectangle()
-                .frame(width: 100, height: 548 - 44, alignment: .center)
-        }
+                ZStack {
+                    // "Fill" for progress meter; stationary
+                    Rectangle()
+                        .frame(width: 100, height: 548 - 44, alignment: .center)
+                    // Will slide up
+                    Rectangle()
+                        .fill(Color.primary)
+                        .colorInvert()
+                        .frame(width: 100, height: 548 - 44, alignment: .center)
+                        .offset(progressMeterOffset)
+
+                }
+            }
     .padding()
         
     }
