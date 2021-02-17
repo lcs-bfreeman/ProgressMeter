@@ -12,6 +12,31 @@ struct ContentView: View {
     // For driving animation to reveal rectangle with progress meter fill
     @State private var progressMeterOffset = CGSize.zero
     
+    // Needed data to calculate colors and size of meter
+    let correctResponses: Int = 3
+    let questionCount: Int = 10
+    
+    // Percentage of full progress meter
+    // If the progress meter is full, this will equal 1.0
+    private var fractionOfFullMeter: Double {
+        Double(correctResponses) / Double(questionCount)
+    }
+    
+    // Ending color for progress meter
+    // 120/360 degrees or 0.333 in Color struct terms is green
+    // which is the top of the meter when all questions are correct
+    private var endColor: Color {
+        
+        // If you had 10 out of 10 questions correct, this will equal 120.0 degrees
+        let endingHue = fractionOfFullMeter * 120.0
+        
+        // Color is:
+        // hue: 0-360 degrees, expressed as a value between 0 and 1
+        // saturation: 0-100%, expressed as a value between 0 and 1
+        // brightness: 0-100%, expressed as a value between 0 and 1
+        return Color(hue: endingHue / 360.0, saturation: 0.8, brightness: 0.9)
+    }
+    
     // Width of the meter
     let meterWidth: CGFloat = 100
 
@@ -31,11 +56,24 @@ struct ContentView: View {
             
             Spacer()
 
-            ZStack {
-                // "Fill" for progress meter; stationary
-                Rectangle()
-                    .frame(width: meterWidth, height: geometry.size.height - verticalPadding, alignment: .center)
+                    ZStack {
 
+                        VStack(spacing: 0) {
+                            
+                            // This pushes the filled part of the progress meter down
+                            Rectangle()
+                                .fill(Color.primary)
+                                .colorInvert()
+                                .frame(width: meterWidth, height: (geometry.size.height - verticalPadding) - CGFloat(fractionOfFullMeter) * (geometry.size.height - verticalPadding), alignment: .center)
+                            
+                            // "Fill" for progress meter; stationary
+                            Rectangle()
+                                .fill(LinearGradient(gradient: Gradient(colors: [Color.red, endColor]),
+                                                     startPoint: .bottom,
+                                                     endPoint: .top))
+                                .frame(width: meterWidth, height: CGFloat(fractionOfFullMeter) * (geometry.size.height - verticalPadding), alignment: .center)
+
+                        }
                 // Will slide up
                 Rectangle()
                     .fill(Color.primary)
